@@ -6,21 +6,33 @@ Features:
 + Searches ACLS Matching username.
 + Searches ACLS Matching group membership including recursive/sub groups.
 
-How to use:
+## How to use:
 
 ```PowerShell
 Get-FilePermissions -username dbizsley -FolderPath "E:\"
 ```
 The Results are returned in the following format:
-    Path                                    Access                                  Identity
-    ----                                    ------                                  --------
-    E:\DCA Governance                       FullControl                             LOWELL2\dbizsley
-    E:\IT                                   FullControl                             LOWELL2\Technology Management
-    E:\Technolgy Management                 Modify, Synchronize                     LOWELL2\Technology Management
-    E:\Development                          ReadAndExecute, Synchronize             LOWELL2\IT Support
-    E:\IT                                   FullControl                             LOWELL2\IT Support
-
+```
+      Path                                    Access                                  Identity
+      ----                                    ------                                  --------
+      E:\DCA Governance                       FullControl                             LOWELL2\dbizsley
+      E:\IT                                   FullControl                             LOWELL2\Technology Management
+      E:\Technolgy Management                 Modify, Synchronize                     LOWELL2\Technology Management
+      E:\Development                          ReadAndExecute, Synchronize             LOWELL2\IT Support
+      E:\IT                                   FullControl                             LOWELL2\IT Support
+```
 
 This can then easily be exported to CSV via the export-csv cmdlet.
 
-NOTE: This function is only designed to enumerate folder permissions and not files.
+## Installation:
+Download ZIP and extract to:
+     %programfiles%\WindowsPowershell\modules\File-Permissions
+
+Make the folder-file permissions if it doesn't already exist.
+Finally import the module.
+
+```PowerShell
+    import-module File-Permissions
+```
+
+NOTE: This function is `only` designed to enumerate folder permissions and not files.
