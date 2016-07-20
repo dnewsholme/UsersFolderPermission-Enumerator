@@ -92,6 +92,6 @@ Function Get-UsersFolderPermissions{
       }
     }
     }
-#Return full array of permissions.
-return $evaluatedpermissions
+    #Return full array of permissions.
+    return $evaluatedpermissions
 }
