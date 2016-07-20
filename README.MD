@@ -11,17 +11,17 @@ Features:
 ## How to use:
 
 ```PowerShell
-Get-FilePermissions -username dbizsley -FolderPath "E:\"
+Get-FilePermissions -username ratchetnclank -FolderPath "E:\"
 ```
 The Results are returned in the following format:
 ```
       Path                                    Access                                  Identity
       ----                                    ------                                  --------
-      E:\DCA Governance                       FullControl                             LOWELL2\dbizsley
-      E:\IT                                   FullControl                             LOWELL2\Technology Management
-      E:\Technolgy Management                 Modify, Synchronize                     LOWELL2\Technology Management
-      E:\Development                          ReadAndExecute, Synchronize             LOWELL2\IT Support
-      E:\IT                                   FullControl                             LOWELL2\IT Support
+      E:\DCA Governance                       FullControl                             DOMAIN\ratchetnclank
+      E:\IT                                   FullControl                             DOMAIN\Technology Management
+      E:\Technology Management                Modify, Synchronize                    DOMAIN\Technology Management
+      E:\Development                          ReadAndExecute, Synchronize             DOMAIN\IT Support
+      E:\IT                                   FullControl                             DOMAIN\IT Support
 ```
 
 This can then easily be exported to CSV via the export-csv cmdlet.
