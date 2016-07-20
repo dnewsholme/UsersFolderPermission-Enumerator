@@ -19,7 +19,7 @@ The Results are returned in the following format:
       ----                                    ------                                  --------
       E:\DCA Governance                       FullControl                             DOMAIN\ratchetnclank
       E:\IT                                   FullControl                             DOMAIN\Technology Management
-      E:\Technology Management                Modify, Synchronize                    DOMAIN\Technology Management
+      E:\Technology Management                Modify, Synchronize                     DOMAIN\Technology Management
       E:\Development                          ReadAndExecute, Synchronize             DOMAIN\IT Support
       E:\IT                                   FullControl                             DOMAIN\IT Support
 ```
