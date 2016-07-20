@@ -14,7 +14,9 @@ Function Get-UsersGroups{
       $username,
       [switch]$recurse
       )
+    #Initialize output variable
     $groups = @()
+    #Search AD user and retrieve the groups removing the unwanted characters from the strings.
     ((((get-aduser $username -properties memberof).memberof) | `
         % {$_ -split(",",2)} | `
          select-string -Pattern "CN\=.+" -AllMatches).Matches).Value | `
@@ -25,6 +27,7 @@ Function Get-UsersGroups{
             }
 
         }
+  #if the recurse switch is applied find the groups they are a member of from group nesting.
   if ($recurse){
   Foreach ($item in $groups.GroupName) {
     $subgroups = try {(get-adgroup $item -properties memberof -ErrorAction stop).memberof}
@@ -43,11 +46,8 @@ Function Get-UsersGroups{
 
         }
   }
+  #Output the groups array
   return $groups
-}
-
-Function Get-NTFSPermissions {
-
 }
 
 Function Get-FilePermissions{
@@ -56,36 +56,40 @@ Function Get-FilePermissions{
       [string]$FolderPath,
       [int]$depth
     )
-    #Process username string, converting domain name to Uppercase and username to lowercase string.
-    $username =  "$(($username.split("\",2)[0]).ToUpper()\)$($username.split("\",2)[1]).ToLower()"
-
-    $ADGroups = Get-UsersGroups -username $username
+    #Cleanse the username
+    if ($username -ilike "*$((Get-ADDomain).NETBIOSNAME)*"){
+        #Process username string removing domain if present.
+        $username =  "$(($username.split("\",2)[1]))"
+    }
     #Create Array for output
     $evaluatedpermissions = @()
 
     #Get Permissions where user is explicitly defined.
-    $explicitpermissions = (get-childitem "$($FolderPath)"  -Exclude "*.*" -Depth "$($depth)"  |`
-    % {Get-Acl $_.FullName -filter {Access -contains $($username) }}) | `
-      ` ? {$_.Access.IdentityReference -like "*$($username)*"}
-      $evaluatedpermissions +=  New-object psobject -property @{
-        "Path" = "$($explicitpermissions.FullName)";
-        "Owner" = "$($explicitpermissions.Owner)";
-        "Access" = "$($explicitpermissions.Access)";
+    $explicitpermissions = (get-childitem "$($FolderPath)"  -Exclude "*.*" -Depth "$($depth)"  | % {Get-Acl $_.FullName -filter {Access -contains $($username) }}) | ? {$_.Access.IdentityReference -like "*$($username)*"}
+      $explicitpermissions  | foreach-object {
+      if ($_ -ne $null) {
+        $evaluatedpermissions +=  New-object psobject -property @{
+          "Path" = "$($_.Path -replace('Microsoft.PowerShell.Core\\FileSystem::',''))";
+          "Identity" = "$(($_.Access).IdentityReference | ? {$_ -ilike "*$username*"})";
+          "Access" = "$(($_.Access).FilesystemRights[0])";
+            }
+        }
       }
+
 
     #Get-Permissions from where user is a member of the group.
     $Usersgroups = Get-UsersGroups $username -recurse
     Foreach ($item in $Usersgroups) {
-    $GroupPermissions = (get-childitem "$($FolderPath)"  -Exclude "*.*" -Depth "$($depth)"  |`
-    % {Get-Acl $_.FullName -filter {Access -contains $($username) }}) | `
-      ` ? {$_.Access.IdentityReference -like "*$($username)*"}
-    if ($GroupPermissions -ne $null) {
+    $GroupPermissions = (get-childitem "$($FolderPath)"  -Exclude "*.*" -Depth "$($depth)"  | % {Get-Acl $_.FullName -filter {Access -contains $($item.GroupName) }}) | ? {$_.Access.IdentityReference -like "*$($item.GroupName)*"}
+    $GroupPermissions | foreach-object {if ($_ -ne $null) {
         $evaluatedpermissions +=  New-object psobject -property @{
-          "Path" = "$($GroupPermissions.FullName)";
-          "Owner" = "$($GroupPermissions.Owner)";
-          "Access" = "$($GroupPermissions.Access)";
-        }
+          "Path" = "$($_.Path -replace('Microsoft.PowerShell.Core\\FileSystem::',''))";
+          "Identity" = "$(($_.Access).IdentityReference | ? {$_ -ilike "*$($item.GroupName)*"})";
+          "Access" = "$((($_.Access) | ?{$_.IdentityReference -ilike "*$($item.GroupName)*"}).FilesystemRights[0])";
+            }
       }
     }
+    }
+#Return full array of permissions.
 return $evaluatedpermissions
 }
