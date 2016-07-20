@@ -25,7 +25,7 @@ The Results are returned in the following format:
 This can then easily be exported to CSV via the export-csv cmdlet.
 
 ## Installation:
-Download ZIP and extract to:
+Download ZIP and extract contents to:
      %programfiles%\WindowsPowershell\modules\File-Permissions
 
 Make the folder-file permissions if it doesn't already exist.
