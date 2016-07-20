@@ -50,11 +50,10 @@ Function Get-UsersGroups{
   return $groups
 }
 
-Function Get-FilePermissions{
+Function Get-UsersFolderPermissions{
     param(
       [string]$username,
-      [string]$FolderPath,
-      [int]$depth
+      [string]$FolderPath
     )
     #Cleanse the username
     if ($username -ilike "*$((Get-ADDomain).NETBIOSNAME)*"){
@@ -65,12 +64,12 @@ Function Get-FilePermissions{
     $evaluatedpermissions = @()
 
     #Get Permissions where user is explicitly defined.
-    $explicitpermissions = (get-childitem "$($FolderPath)"  -Exclude "*.*" -Depth "$($depth)"  | % {Get-Acl $_.FullName -filter {Access -contains $($username) }}) | ? {$_.Access.IdentityReference -like "*$($username)*"}
+    $explicitpermissions = (get-childitem "$($FolderPath)" |? {$_.PSiscontainer} | % {Get-Acl $_.FullName -filter {Access -contains $($username) }}) | ? {$_.Access.IdentityReference -like "*$($username)"}
       $explicitpermissions  | foreach-object {
       if ($_ -ne $null) {
         $evaluatedpermissions +=  New-object psobject -property @{
           "Path" = "$($_.Path -replace('Microsoft.PowerShell.Core\\FileSystem::',''))";
-          "Identity" = "$(($_.Access).IdentityReference | ? {$_ -ilike "*$username*"})";
+          "Identity" = "$(($_.Access).IdentityReference | ? {$_ -ilike "*$username"})";
           "Access" = "$(($_.Access).FilesystemRights[0])";
             }
         }
@@ -80,12 +79,12 @@ Function Get-FilePermissions{
     #Get-Permissions from where user is a member of the group.
     $Usersgroups = Get-UsersGroups $username -recurse
     Foreach ($item in $Usersgroups) {
-    $GroupPermissions = (get-childitem "$($FolderPath)"  -Exclude "*.*" -Depth "$($depth)"  | % {Get-Acl $_.FullName -filter {Access -contains $($item.GroupName) }}) | ? {$_.Access.IdentityReference -like "*$($item.GroupName)*"}
+    $GroupPermissions = (get-childitem "$($FolderPath)" |? {$_.PSiscontainer} | % {Get-Acl $_.FullName -filter {Access -contains $($item.GroupName) }}) | ? {$_.Access.IdentityReference -like "*$($item.GroupName)*"}
     $GroupPermissions | foreach-object {if ($_ -ne $null) {
         $evaluatedpermissions +=  New-object psobject -property @{
           "Path" = "$($_.Path -replace('Microsoft.PowerShell.Core\\FileSystem::',''))";
-          "Identity" = "$(($_.Access).IdentityReference | ? {$_ -ilike "*$($item.GroupName)*"})";
-          "Access" = "$((($_.Access) | ?{$_.IdentityReference -ilike "*$($item.GroupName)*"}).FilesystemRights[0])";
+          "Identity" = "$(($_.Access).IdentityReference | ? {$_ -ilike "*$($item.GroupName)"})";
+          "Access" = "$((($_.Access) | ?{$_.IdentityReference -ilike "*$($item.GroupName)"}).FilesystemRights[0])";
             }
       }
     }
