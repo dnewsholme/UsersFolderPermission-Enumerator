@@ -9,12 +9,12 @@ Features:
 How to use:
 
 ```PowerShell
-Get-FilePermissions -username dbizsley -FolderPath "E:\
+Get-FilePermissions -username dbizsley -FolderPath "E:\"
 ```
 The Results are returned in the following format:
     Path                                    Access                                  Identity
     ----                                    ------                                  --------
-    E:\DCA Governance                       FullControl                             LOWELL2\dbizsley_p
+    E:\DCA Governance                       FullControl                             LOWELL2\dbizsley
     E:\IT                                   FullControl                             LOWELL2\Technology Management
     E:\Technolgy Management                 Modify, Synchronize                     LOWELL2\Technology Management
     E:\Development                          ReadAndExecute, Synchronize             LOWELL2\IT Support
