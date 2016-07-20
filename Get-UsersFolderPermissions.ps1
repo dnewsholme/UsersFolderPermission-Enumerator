@@ -78,6 +78,9 @@ Function Get-UsersFolderPermissions{
 
     #Get-Permissions from where user is a member of the group.
     $Usersgroups = Get-UsersGroups $username -recurse
+    $usersgroups += New-object psobject -property @{"GroupName" = "Everyone"}
+    $usersgroups += New-object psobject -property @{"GroupName" = "Authenticated Users"}
+    $usersgroups += New-object psobject -property @{"GroupName" = "Domain Computers"}
     Foreach ($item in $Usersgroups) {
     $GroupPermissions = (get-childitem "$($FolderPath)" |? {$_.PSiscontainer} | % {Get-Acl $_.FullName -filter {Access -contains $($item.GroupName) }}) | ? {$_.Access.IdentityReference -like "*$($item.GroupName)*"}
     $GroupPermissions | foreach-object {if ($_ -ne $null) {
