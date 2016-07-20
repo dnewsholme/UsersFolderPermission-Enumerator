@@ -6,6 +6,8 @@ Features:
 + Searches ACLS Matching username.
 + Searches ACLS Matching group membership including recursive/sub groups.
 
+`Note: you need to run the PowerShell window as privileged user such as a domain admin.`
+
 ## How to use:
 
 ```PowerShell
