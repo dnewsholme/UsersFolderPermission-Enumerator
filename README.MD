@@ -11,13 +11,29 @@ Features:
 ## How to use:
 
 ```PowerShell
-Get-FilePermissions -username ratchetnclank -FolderPath "E:\"
+Get-FilePermissions -username bgates -FolderPath "E:\" -recurse -depth 1
 ```
+### Parameters
+`username`
+    The username you wish to see the effective permissions for, either Domain\username format or just username.
+
+`FolderPath`
+    The folder you wish to get permissions from. Note it Searches the children of this item.
+
+`recurse`
+    Adding this switch will search the child directories as well.
+
+`NoDefaultGroups`
+    Using this switch will remove the groups users are a memberof by default eg. Everyone,Domain Computers,Authenticated Users and BUILTIN\Users
+
+`depth`
+    This parameter only works with recurse if not specified with recurse it will default to 0. Otherwise Will search the amount of sub-directories you specify.
+
 The Results are returned in the following format:
 ```
       Path                                    Access                                  Identity
       ----                                    ------                                  --------
-      E:\DCA Governance                       FullControl                             DOMAIN\ratchetnclank
+      E:\DCA Governance                       FullControl                             DOMAIN\bgates
       E:\IT                                   FullControl                             DOMAIN\Technology Management
       E:\Technology Management                Modify, Synchronize                     DOMAIN\Technology Management
       E:\Development                          ReadAndExecute, Synchronize             DOMAIN\IT Support
