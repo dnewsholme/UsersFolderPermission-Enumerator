@@ -11,7 +11,7 @@ Features:
 ## How to use:
 
 ```PowerShell
-Get-FilePermissions -username bgates -FolderPath "E:\" -recurse -depth 1
+Get-UserFolderPermissions -username bgates -FolderPath "E:\" -recurse -depth 1
 ```
 ### Parameters
 `username`
